@@ -11,6 +11,9 @@ import 'package:pixel_things/platform/settings_backup.dart';
 import 'package:pixel_things/platform/desktop/screensaver_handler.dart';
 import 'package:pixel_things/platform/desktop/launch_at_startup_handler.dart';
 import 'package:pixel_things/platform/desktop/window_handler.dart';
+import 'package:pixel_things/screens/pomodoro_screen.dart';
+import 'package:pixel_things/screens/countdown_screen.dart';
+import 'package:pixel_things/screens/alarm_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   final VoidCallback onBack;
@@ -51,6 +54,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               _buildSectionTitle('Theme'),
               const SizedBox(height: 12),
               _buildThemeSelector(),
+              const SizedBox(height: 32),
+              _buildSectionTitle('Tools'),
+              const SizedBox(height: 12),
+              _buildToolsSection(),
               if (PlatformUtils.isDesktop) ...[
                 const SizedBox(height: 32),
                 _buildSectionTitle('Screensaver'),
@@ -231,6 +238,87 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
             ),
           );
+        },
+      ),
+    );
+  }
+
+  Widget _buildToolsSection() {
+    return Row(
+      children: [
+        _buildToolButton(
+          icon: Icons.timer,
+          label: 'Pomodoro',
+          color: const Color(0xFFFF6B6B),
+          onTap: () => _navigateToTool('pomodoro'),
+        ),
+        const SizedBox(width: 12),
+        _buildToolButton(
+          icon: Icons.hourglass_empty,
+          label: 'Countdown',
+          color: const Color(0xFF4ECDC4),
+          onTap: () => _navigateToTool('countdown'),
+        ),
+        const SizedBox(width: 12),
+        _buildToolButton(
+          icon: Icons.alarm,
+          label: 'Alarm',
+          color: const Color(0xFFFFD93D),
+          onTap: () => _navigateToTool('alarm'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildToolButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withOpacity(0.3)),
+          ),
+          child: Column(
+            children: [
+              Icon(icon, color: color, size: 28),
+              const SizedBox(height: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToTool(String tool) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          switch (tool) {
+            case 'pomodoro':
+              return PomodoroScreen(onBack: () => Navigator.pop(context));
+            case 'countdown':
+              return CountdownScreen(onBack: () => Navigator.pop(context));
+            case 'alarm':
+              return AlarmScreen(onBack: () => Navigator.pop(context));
+            default:
+              return const SizedBox();
+          }
         },
       ),
     );

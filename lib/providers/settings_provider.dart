@@ -116,6 +116,12 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     await _save();
   }
 
+  // 语言设置
+  Future<void> setLanguage(String languageCode) async {
+    state = state.copyWith(languageCode: languageCode);
+    await _save();
+  }
+
   // 批量更新
   Future<void> updateSettings(AppSettings Function(AppSettings) updater) async {
     state = updater(state);

@@ -42,6 +42,9 @@ class AppSettings {
   final bool minimizeToTray;
   final bool startMinimized;
 
+  // 语言设置
+  final String languageCode; // 'en', 'zh', 'system'
+
   const AppSettings({
     this.matrixRows = 16,
     this.pixelGap = 2.0,
@@ -61,6 +64,7 @@ class AppSettings {
     this.launchAtStartup = false,
     this.minimizeToTray = true,
     this.startMinimized = false,
+    this.languageCode = 'system',
   });
 
   AppSettings copyWith({
@@ -82,6 +86,7 @@ class AppSettings {
     bool? launchAtStartup,
     bool? minimizeToTray,
     bool? startMinimized,
+    String? languageCode,
   }) {
     return AppSettings(
       matrixRows: matrixRows ?? this.matrixRows,
@@ -102,6 +107,7 @@ class AppSettings {
       launchAtStartup: launchAtStartup ?? this.launchAtStartup,
       minimizeToTray: minimizeToTray ?? this.minimizeToTray,
       startMinimized: startMinimized ?? this.startMinimized,
+      languageCode: languageCode ?? this.languageCode,
     );
   }
 
@@ -125,6 +131,7 @@ class AppSettings {
       'launchAtStartup': launchAtStartup,
       'minimizeToTray': minimizeToTray,
       'startMinimized': startMinimized,
+      'languageCode': languageCode,
     };
   }
 
@@ -148,6 +155,7 @@ class AppSettings {
       launchAtStartup: json['launchAtStartup'] ?? false,
       minimizeToTray: json['minimizeToTray'] ?? true,
       startMinimized: json['startMinimized'] ?? false,
+      languageCode: json['languageCode'] ?? 'system',
     );
   }
 

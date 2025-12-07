@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pixel_things/providers/app_state.dart';
 import 'package:pixel_things/providers/settings_provider.dart';
 import 'package:pixel_things/core/utils/color_utils.dart';
 import 'package:pixel_things/core/models/app_theme.dart';
+import 'package:pixel_things/widgets/color_picker.dart';
 import 'package:pixel_things/platform/platform_utils.dart';
+import 'package:pixel_things/platform/settings_backup.dart';
 import 'package:pixel_things/platform/desktop/screensaver_handler.dart';
 import 'package:pixel_things/platform/desktop/launch_at_startup_handler.dart';
 import 'package:pixel_things/platform/desktop/window_handler.dart';
@@ -54,6 +57,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 const SizedBox(height: 12),
                 _buildScreensaverSettings(),
               ],
+              const SizedBox(height: 32),
+              _buildSectionTitle('Language'),
+              const SizedBox(height: 12),
+              _buildLanguageSelector(),
+              const SizedBox(height: 32),
+              _buildSectionTitle('Backup'),
+              const SizedBox(height: 12),
+              _buildBackupSection(),
               const SizedBox(height: 32),
               _buildSectionTitle('Controls'),
               const SizedBox(height: 12),
@@ -221,6 +232,160 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildLanguageSelector() {
+    final settings = ref.watch(settingsProvider);
+    final currentLang = settings.languageCode;
+
+    final languages = [
+      ('system', 'System', Icons.settings),
+      ('en', 'English', Icons.language),
+      ('zh', '中文', Icons.translate),
+    ];
+
+    return Row(
+      children: languages.map((lang) {
+        final isSelected = lang.$1 == currentLang;
+        return Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: GestureDetector(
+            onTap: () {
+              ref.read(settingsProvider.notifier).setLanguage(lang.$1);
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? PixelColors.timeColor.withOpacity(0.2)
+                    : const Color(0xFF2A2A2A),
+                borderRadius: BorderRadius.circular(8),
+                border: isSelected
+                    ? Border.all(color: PixelColors.timeColor, width: 1)
+                    : null,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    lang.$3,
+                    color: isSelected ? PixelColors.timeColor : Colors.white70,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    lang.$2,
+                    style: TextStyle(
+                      color: isSelected ? PixelColors.timeColor : Colors.white70,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildBackupSection() {
+    final settings = ref.watch(settingsProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A2A2A),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          _SettingsButton(
+            title: 'Export Settings',
+            onTap: () async {
+              await SettingsBackup.shareSettings(settings);
+            },
+          ),
+          const SizedBox(height: 8),
+          _SettingsButton(
+            title: 'Import Settings',
+            onTap: () async {
+              final imported = await SettingsBackup.importSettings();
+              if (imported != null) {
+                await ref.read(settingsProvider.notifier).updateSettings((_) => imported);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Settings imported successfully')),
+                  );
+                }
+              }
+            },
+          ),
+          const SizedBox(height: 8),
+          _SettingsButton(
+            title: 'Copy to Clipboard',
+            onTap: () async {
+              final json = await SettingsBackup.settingsToClipboard(settings);
+              await Clipboard.setData(ClipboardData(text: json));
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Settings copied to clipboard')),
+                );
+              }
+            },
+          ),
+          const SizedBox(height: 8),
+          _SettingsButton(
+            title: 'Reset to Defaults',
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: const Color(0xFF2A2A2A),
+                  title: const Text('Reset Settings', style: TextStyle(color: Colors.white)),
+                  content: const Text(
+                    'Are you sure you want to reset all settings to defaults?',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        ref.read(settingsProvider.notifier).resetToDefaults();
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Reset', style: TextStyle(color: Colors.red)),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showColorPicker(String title, Color initialColor, Function(Color) onConfirm) {
+    Color selectedColor = initialColor;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A1A),
+        title: Text(title, style: const TextStyle(color: Colors.white)),
+        content: HSVColorPicker(
+          initialColor: initialColor,
+          onColorChanged: (color) => selectedColor = color,
+          onConfirm: () {
+            onConfirm(selectedColor);
+            Navigator.pop(context);
+          },
+        ),
       ),
     );
   }

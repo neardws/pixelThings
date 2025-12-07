@@ -35,6 +35,16 @@ dependencies:
   
   # Battery info (mobile)
   battery_plus: ^5.0.2
+  
+  # File sharing
+  share_plus: ^7.2.1
+  
+  # File picker
+  file_picker: ^6.1.1
+  
+  # Localization
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

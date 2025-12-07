@@ -42,6 +42,9 @@ dependencies:
   # File picker
   file_picker: ^6.1.1
   
+  # HTTP client
+  http: ^1.1.0
+  
   # Localization
   flutter_localizations:
     sdk: flutter

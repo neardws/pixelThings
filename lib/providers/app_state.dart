@@ -10,6 +10,7 @@ import 'package:pixel_things/core/utils/color_utils.dart';
 import 'package:pixel_things/core/utils/date_utils.dart';
 import 'package:pixel_things/plugins/plugin_manager.dart';
 import 'package:pixel_things/plugins/plugin_interface.dart';
+export 'package:pixel_things/plugins/plugin_manager.dart' show BlendMode;
 
 class AppState extends ChangeNotifier {
   final PluginManager _pluginManager = PluginManager();
@@ -274,7 +275,11 @@ class AppState extends ChangeNotifier {
   }
 
   void _renderEffectWithClock(int deltaTime) {
-    _pluginManager.updateActivePlugin(_matrix, deltaTime);
+    if (_pluginManager.isCombineMode) {
+      _pluginManager.updateCombinedPlugins(_matrix, deltaTime);
+    } else {
+      _pluginManager.updateActivePlugin(_matrix, deltaTime);
+    }
     _renderClockOverlay();
   }
 
@@ -335,6 +340,7 @@ class AppState extends ChangeNotifier {
 
   void deactivatePlugin() {
     _pluginManager.deactivatePlugin();
+    _pluginManager.setCombineMode(false);
     _displayState = _displayState.copyWith(mode: DisplayMode.clockOnly);
     _setTargetLayoutMode(ClockDisplayMode.centered); // 触发放大动画
     _restartTimer();
@@ -366,6 +372,36 @@ class AppState extends ChangeNotifier {
 
   void _restartTimer() {
     _startClockUpdate();
+  }
+
+  // 组合模式
+  bool get isCombineMode => _pluginManager.isCombineMode;
+  Set<String> get combinedPluginIds => _pluginManager.activePluginIds;
+  BlendMode get blendMode => _pluginManager.blendMode;
+
+  void setCombineMode(bool enabled) {
+    _pluginManager.setCombineMode(enabled);
+    if (enabled) {
+      _displayState = _displayState.copyWith(mode: DisplayMode.effectWithClock);
+      _setTargetLayoutMode(ClockDisplayMode.miniTopLeft);
+    }
+    _restartTimer();
+    notifyListeners();
+  }
+
+  void setBlendMode(BlendMode mode) {
+    _pluginManager.setBlendMode(mode);
+    notifyListeners();
+  }
+
+  void togglePluginInCombine(String pluginId) {
+    _pluginManager.togglePluginInCombine(pluginId);
+    if (_pluginManager.activePluginIds.isNotEmpty) {
+      _displayState = _displayState.copyWith(mode: DisplayMode.effectWithClock);
+      _setTargetLayoutMode(ClockDisplayMode.miniTopLeft);
+    }
+    _restartTimer();
+    notifyListeners();
   }
 
   @override

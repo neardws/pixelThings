@@ -1,40 +1,23 @@
-# App Icon Resources
+# Icon Assets
 
-Place the following icon files in this directory:
+## System Tray Icons
 
-## Required Files
+- `tray_icon.svg` - Main tray icon (22x22 pixels, green pixel grid)
 
-| File | Size | Format | Usage |
-|------|------|--------|-------|
-| `app_icon.png` | 256x256 | PNG | General use, macOS |
-| `app_icon.ico` | Multi-size | ICO | Windows app icon |
-| `tray_icon.png` | 22x22 | PNG | System tray |
+For production, convert to platform-specific formats:
+- **macOS**: PNG (22x22, 44x44 @2x)
+- **Windows**: ICO (16x16, 32x32, 48x48)
+- **Linux**: PNG (22x22)
 
-## Icon Design Guidelines
+## App Icons
 
-- **Style**: Pixel art / retro digital clock
-- **Background**: Transparent
-- **Colors**: Green (#00FF00) on black or transparent
-- **Content**: Simplified clock digits "12:34" or pixel grid pattern
+Generate app icons using tools like:
+- flutter_launcher_icons
+- AppIcon.co
+- Android Studio Image Asset Studio
 
-## Recommended Design
-
-```
-Simple pixel clock face:
-┌────────────┐
-│  ██ ██     │
-│  ██ ██     │
-│     ██     │
-│  ██ ██     │
-│  ██ ██     │
-└────────────┘
-```
-
-## How to Generate
-
-You can use any pixel art editor like:
-- Aseprite
-- Piskel (free online)
-- GIMP
-
-Or generate programmatically with Flutter/Dart using the `image` package.
+Recommended sizes:
+- Android: 48x48 to 512x512 (mdpi to xxxhdpi)
+- iOS: 20x20 to 1024x1024
+- macOS: 16x16 to 1024x1024
+- Windows: 16x16 to 256x256

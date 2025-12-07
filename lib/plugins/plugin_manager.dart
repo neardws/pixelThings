@@ -8,6 +8,9 @@ import 'package:pixel_things/plugins/worm_plugin.dart';
 import 'package:pixel_things/plugins/plasma_plugin.dart';
 import 'package:pixel_things/plugins/starfield_plugin.dart';
 import 'package:pixel_things/plugins/snow_plugin.dart';
+import 'package:pixel_things/plugins/bouncing_ball_plugin.dart';
+import 'package:pixel_things/plugins/fireworks_plugin.dart';
+import 'package:pixel_things/plugins/ripple_plugin.dart';
 
 class PluginManager {
   final Map<String, Plugin> _plugins = {};
@@ -23,6 +26,9 @@ class PluginManager {
     _registerPlugin(PlasmaPlugin());
     _registerPlugin(StarfieldPlugin());
     _registerPlugin(SnowPlugin());
+    _registerPlugin(BouncingBallPlugin());
+    _registerPlugin(FireworksPlugin());
+    _registerPlugin(RipplePlugin());
   }
 
   void _registerPlugin(Plugin plugin) {
